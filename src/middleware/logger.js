@@ -1,10 +1,14 @@
+const options = require("../services/timeFormat");
+
 function logger(req, res, next) {
   const method = req.method;
   const path = req.originalUrl;
-  const time = new Date().toISOString();
+  const time = new Date().toLocaleString("en-IN", options);
 
-  const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
-  console.log(`[Gateway] ${req.method} ${fullUrl}`);
+  const fullUrl = `${time}${" "}${req.protocol}://${req.get("host")}${
+    req.originalUrl
+  }`;
+  console.log(`[Gateway] ${method} ${fullUrl}`);
   next();
 }
 
