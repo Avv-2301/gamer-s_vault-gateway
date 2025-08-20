@@ -1,28 +1,23 @@
-const express = require('express');
-const app = express();
+const express = require("express");
 const http = require("http");
-require('dotenv').config();
+require("dotenv").config();
 
-const port = process.env.PORT || 8080;
+const app = express();
+const port = process.env.PORT || 3000;
 
-app.use(express.json({ limit: "10mb" }));
+// app.use(express.json({ limit: "10mb" }));
+const logger = require("./src/middleware/logger");
+app.use(logger);
+
 
 const indexRoutes = require("./src/routes/index");
-
 app.use("/", indexRoutes);
 
-
 app.get("/", (req, res) => {
-  return res.json({
-    success: true,
-    message: "Your server is up and running.... for GATEWAY ",
-  });
+  return res.json({ success: true, message: "Gateway is running" });
 });
 
 const server = http.createServer(app);
-
 server.listen(port, () => {
-  console.log(
-    `Server is running on http://localhost:${process.env.PORT} for GATEWAY`
-  );
+  console.log(`Gateway running at http://localhost:${port}`);
 });
