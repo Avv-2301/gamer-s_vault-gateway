@@ -4,6 +4,6 @@ const { profileService } = require('../../config/services');
 
 const router = express.Router();
 
-router.use("/", proxyFactory(profileService, {"^/profiles":""}))
+router.use("/", proxyFactory(profileService, {"^/profile":""}))
 
 module.exports = router;
