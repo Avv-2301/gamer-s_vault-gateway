@@ -1,0 +1,23 @@
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+module.exports.verify = function (token, callback) {
+  try {
+    return jwt.verify(token, process.env.JWT_USER_SECRETKEY, {}, callback);
+  } catch (error) {
+    return error;
+  }
+};
+
+module.exports.decode = async (token) => {
+  const parts = token.split(" ");
+  if (parts.length === 2) {
+    const scheme = parts[0];
+    const credentials = parts[1];
+    if (/^Bearer$/i.test(scheme)) {
+      return credentials;
+    }
+    return false;
+  }
+  return false;
+};
