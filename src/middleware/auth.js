@@ -13,7 +13,7 @@ module.exports = {
   userAuthToken: async (req, res, next) => {
     try {
       const token = req.headers.authorization;
-      // console.log(token,"token")
+      // console.log(token, "TOKEN");
 
       // skip auth for trusted internal calls
       if (req.headers["x-internal-call"] === "true") {

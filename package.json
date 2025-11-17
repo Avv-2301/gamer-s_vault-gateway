@@ -13,8 +13,10 @@
   "description": "",
   "dependencies": {
     "@avv-2301/gamers-vault-common": "^1.0.14",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
     "http-proxy-middleware": "^3.0.5",
