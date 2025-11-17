@@ -15,6 +15,9 @@ app.use(cors({
 const logger = require("./src/middleware/logger");
 app.use(logger);
 
+// Audit logging middleware (captures all API requests)
+const auditLog = require("./src/middleware/auditLog");
+app.use(auditLog);
 
 const indexRoutes = require("./src/routes/index");
 app.use("/", indexRoutes);

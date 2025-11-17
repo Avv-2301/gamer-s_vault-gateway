@@ -1,22 +1,24 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
 function proxyFactory(target, pathRewrite = {}) {
-  return createProxyMiddleware({
+  const proxyMiddleware = createProxyMiddleware({
     target,
     changeOrigin: true,
     pathRewrite,
     timeout: parseInt(process.env.PROXY_TIMEOUT) || 30000, // 30 seconds default
-    onProxyReq: (proxyReq, req) => {
-      // Set user info from req.user (if available) or from auth middleware
-      if (req.user) {
-        proxyReq.setHeader("x-user-id", req.user._id || req.user.id);
-        proxyReq.setHeader("x-user-email", req.user.email);
-        proxyReq.setHeader("x-user-role", req.user.role);
-      } else if (req.authUserId) {
-        // Support for adminAuth/userAuthToken middleware which sets req.authUserId
-        proxyReq.setHeader("x-user-id", req.authUserId);
+    onProxyReq: (proxyReq, req, res) => {
+      // Set user info from auth middleware (req.authUserId and req.role set by userAuthToken/adminAuth)
+      // Headers are already set in the wrapper, but ensure they're on proxyReq as well
+      if (req.authUserId) {
+        proxyReq.setHeader("x-user-id", String(req.authUserId));
         if (req.role) {
-          proxyReq.setHeader("x-user-role", req.role);
+          proxyReq.setHeader("x-user-role", String(req.role));
+        }
+      } else if (req.headers["x-user-id"]) {
+        // Use headers if authUserId not available
+        proxyReq.setHeader("x-user-id", req.headers["x-user-id"]);
+        if (req.headers["x-user-role"]) {
+          proxyReq.setHeader("x-user-role", req.headers["x-user-role"]);
         }
       }
     },
@@ -29,6 +31,20 @@ function proxyFactory(target, pathRewrite = {}) {
       }
     },
   });
+  
+  // Wrap the proxy middleware to set headers from auth middleware
+  return (req, res, next) => {
+    // Set headers directly on req from auth middleware values
+    // This ensures headers are available when proxy forwards the request
+    if (req.authUserId) {
+      req.headers["x-user-id"] = String(req.authUserId);
+      if (req.role) {
+        req.headers["x-user-role"] = String(req.role);
+      }
+    }
+    
+    return proxyMiddleware(req, res, next);
+  };
 }
 
 module.exports = proxyFactory;
